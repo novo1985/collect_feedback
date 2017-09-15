@@ -3,7 +3,7 @@ const app = express();//call express function create app object
 
 //create handlers associated with app
 app.get('/', (req, res) => {
-  res.send({ hi : 'there' });
+  res.send({ Bye : 'buddy' });
 });//get(), first argument is '/', second argument is arrow function(with two argument inside)
 
 
