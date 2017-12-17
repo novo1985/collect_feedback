@@ -1,21 +1,27 @@
-const express = require('express');//create express library
-const app = express();//call express function create app object
+const express = require('express');
+const mongoose = require('mongoose');
+const cookieSession = require('cookie-session');
+const passport = require('passport');
+const keys = require('./config/keys.js');
+require('./models/User.js');
+require('./services/passport.js');
+const authRoutes = require('./routes/authRoutes.js');
 
-//create handlers associated with app
-app.get('/', (req, res) => {
-  res.send({ Bye : 'buddy' });
-});//get(), first argument is '/', second argument is arrow function(with two argument inside)
+mongoose.connect(keys.mongoURI);
 
+const app = express();
 
-//Dynamic figure out which port we need listen to
+app.use(
+  cookieSession({
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    keys: [keys.cookieKey]
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+authRoutes(app);
+
 const PORT = process.env.PORT || 5000;
-//whenever HeroKu run the application, it has the ability to inject the variable "env"
-//heroku send us the runtime configuration, only want to tell us the port until the
-//very last second when the app start to excute by Heroku
-app.listen(PORT);//instruct express to tell Node to listen incoming traffic on port 5000
-//test: localhost:5000
 
-
-
-
-
+app.listen(PORT);
