@@ -23,21 +23,32 @@ passport.use(
       callbackURL: '/auth/google/callback',
       proxy: true
     },
-    (acessToken, refreshToken, profile, done) => {
-      //console.log('access token', acessToken);
-      //console.log('refresh token', refreshToken);
-      //console.log('profile', profile);
-      User.findOne({ googleId: profile.id }).then(existingUser => {
-        if (existingUser) {
-          // we already have a record with the given id
-          done(null, existingUser);
-        } else {
-          // we don't have a user record with this id, make a new record
-          new User({ googleId: profile.id })
-            .save()
-            .then(user => done(null, user));
-        }
-      });
+    // (acessToken, refreshToken, profile, done) => {
+    //   //console.log('access token', acessToken);
+    //   //console.log('refresh token', refreshToken);
+    //   //console.log('profile', profile);
+    //   User.findOne({ googleId: profile.id }).then(existingUser => {
+    //     if (existingUser) {
+    //       // we already have a record with the given id
+    //       done(null, existingUser);
+    //     } else {
+    //       // we don't have a user record with this id, make a new record
+    //       new User({ googleId: profile.id })
+    //         .save()
+    //         .then(user => done(null, user));
+    //     }
+    //   });
+    // }
+    async (acessToken, refreshToken, profile, done) => {
+      const existingUser = await User.findOne({ googleId: profile.id });
+
+      if (existingUser) {
+        // we already have a record with the given id
+        return done(null, existingUser);
+      }
+      // we don't have a user record with this id, make a new record
+      const user = await new User({ googleId: profile.id }).save();
+      done(null, user);
     }
   )
 );
